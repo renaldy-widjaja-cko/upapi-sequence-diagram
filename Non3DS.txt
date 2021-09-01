@@ -1,0 +1,40 @@
+title Payment API
+participantgroup #lightblue **Merchant**
+participant Merchant Client
+participant Merchant Backend
+end 
+participantgroup #lightgreen **Checkout.com**
+participant Checkout API
+participant Webhook
+end 
+participantgroup #orange **External**
+participant 3DS/MPI
+end 
+
+group Frame.js / Token API
+Merchant Client->>Checkout API: Send customer card details
+Checkout API-->Merchant Client: **Token data** (tok_xxx)
+end
+
+group Without 3DS, non-auto capture
+Merchant Client->>Merchant Backend: Pass **Token Data**
+activate Merchant Backend
+Merchant Backend ->>Checkout API: Payment Request using **Token Data**
+Checkout API-->>Merchant Backend:Payment Response [Status=**Authorized**]
+Merchant Backend->>Checkout API:Capture Request using **Payment Id**
+Checkout API-->>Merchant Backend:Capture Response
+deactivate Merchant Backend
+end 
+
+group Without 3DS, auto capture
+Merchant Client->>Merchant Backend: Pass **Token Data**
+Merchant Backend->>Checkout API: Payment Request using **Token Data**
+Checkout API-->>Checkout API:Capture
+space -5
+Merchant Backend<<--Checkout API:Payment Response [Status=**Authorized**]
+Merchant Backend->>Checkout API: Payment Detail Request
+Checkout API->>Merchant Backend: Payment Response [Status=**Captured**]
+end
+
+
+

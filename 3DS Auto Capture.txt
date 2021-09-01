@@ -1,0 +1,29 @@
+title Payment API
+participantgroup #lightblue **Merchant**
+participant Merchant Client
+participant Merchant Backend
+end 
+participantgroup #lightgreen **Checkout.com**
+participant Checkout API
+participant Webhook
+end 
+participantgroup #orange **External**
+participant 3DS/MPI
+end 
+
+group With 3DS, auto capture
+Merchant Client->>Merchant Backend: Pass **Token Data**
+Merchant Backend->>Checkout API: Payment Request using **Token Data**
+Checkout API->>3DS/MPI: Authentication Request
+3DS/MPI-->>Checkout API: Authentication Response [Redirect Url]
+Merchant Backend<<--Checkout API:Payment Response [Status=**Pending**, Redirect Url]
+Merchant Backend-->Merchant Client: Redirect Url
+Merchant Client->3DS/MPI:OTP Keyed in
+3DS/MPI-->Checkout API: Authentication Response [Authenticated]
+Checkout API-->>Checkout API:Authorize
+Webhook-->>Merchant Backend: Webhook Notification [Payment Approved Event]
+Checkout API-->>Checkout API:Capture
+Webhook-->>Merchant Backend: Webhook Notification [Payment Captured Event]
+Merchant Backend->>Checkout API: Payment Detail Request
+Checkout API->>Merchant Backend: Payment Response [Status=**Captured**]
+end 

@@ -1,0 +1,27 @@
+title Payment API
+
+participantgroup #yellow **Customer**
+participant Customer
+end
+
+participantgroup #lightblue **Merchant**
+participant Merchant
+end 
+participantgroup #lightgreen **Checkout.com**
+participant Checkout API
+end 
+
+
+group Recurring Payment
+==Initial Payment==
+Customer->Merchant:Payment Request [PAN,EXP,CVV]
+Merchant->Checkout API:Customer Initiated Payment Request 
+ref over Merchant,Checkout API:[Source=**Token**, PaymentType=**Recurring**(VISA)/**Regular**(Others), MerchantInitiated=**FALSE**]
+Checkout API->Merchant: Payment Response
+ref over Merchant,Checkout API:[PaymentId=**Pay_1**,Source.id=**src_a**,Status=**Captured**]
+==Subsequent Payment==
+Merchant->Checkout API:Merchant Initiated Payment Request 
+ref over Merchant,Checkout API:[Source.id=**src_a**, PaymentType=**Recurring**, MerchantInitiated=**TRUE**, PreviousPaymnentId=**pay_1**]
+Checkout API->Merchant: Payment Response
+ref over Merchant,Checkout API:[PaymentId:**Pay_x**,Source:**src_a**,Status:**Captured**]
+end
